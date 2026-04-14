@@ -173,6 +173,48 @@ class DataSet4D(torch.utils.data.Dataset):
         return torch.Tensor(np.float32(out)).to(device)
 
 
+def tiled_inference(model, frames_tensor, tile_size, device, overlap=32):
+    """Run model on overlapping tiles and blend results for large frames."""
+    # frames_tensor: (C, H, W) where C = num input frames (e.g. 5 or 9)
+    C, H, W = frames_tensor.shape
+    stride = tile_size - overlap
+    out = torch.zeros(1, H, W, device='cpu')
+    weight = torch.zeros(1, H, W, device='cpu')
+
+    # Create blending window
+    win_1d = torch.ones(tile_size)
+    if overlap > 0:
+        ramp = torch.linspace(0, 1, overlap)
+        win_1d[:overlap] = ramp
+        win_1d[-overlap:] = ramp.flip(0)
+    win_2d = win_1d.unsqueeze(0) * win_1d.unsqueeze(1)  # (tile, tile)
+
+    for y in range(0, H, stride):
+        for x in range(0, W, stride):
+            y1 = min(y, H - tile_size)
+            x1 = min(x, W - tile_size)
+            y2, x2 = y1 + tile_size, x1 + tile_size
+
+            tile_in = frames_tensor[:, y1:y2, x1:x2].unsqueeze(0).to(device)
+            tile_out = model(tile_in).cpu()  # (1, 1, tile, tile)
+
+            w = win_2d.clone()
+            if y1 == 0:
+                w[:overlap, :] = 1
+            if x1 == 0:
+                w[:, :overlap] = 1
+            if y2 == H:
+                w[-overlap:, :] = 1
+            if x2 == W:
+                w[:, -overlap:] = 1
+
+            out[0, y1:y2, x1:x2] += tile_out[0, 0] * w
+            weight[0, y1:y2, x1:x2] += w
+
+    out /= weight.clamp(min=1e-8)
+    return out
+
+
 def main(args):
     data = args.data
     output_file = args.output_file
@@ -195,9 +237,13 @@ def main(args):
     print(device, args)
     
     model, optimizer = load_model(is_fourdim=four_dim, is_include_neighbor=include_neighbor)
+
+    if torch.cuda.device_count() > 1:
+        print(f"Using DataParallel on {torch.cuda.device_count()} GPUs")
+        model = nn.DataParallel(model)
+
     scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, milestones=[15, 30, 40], gamma=0.5)
-    #scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=2, eta_min=0)
-    
+
     best_model = model.state_dict()
     best_loss = 1000000
     
@@ -282,34 +328,52 @@ def main(args):
             best_epoch = epoch
     
     # Denoise the video
-        
+
     if four_dim:
         ds = DataSet4D(data, multiply=args.multiply)
     else:
         ds = DataSet(data, multiply=args.multiply)
-        
+
     denoised = np.zeros(ds.img.shape,dtype=np.float32)
     model.load_state_dict(best_model)
     model.eval()
-    
+
+    # Unwrap DataParallel for single-GPU tiled inference and clean checkpoint
+    infer_model = model.module if isinstance(model, nn.DataParallel) else model
+
     if save_model:
-        torch.save(model.state_dict(), file_name+'.pth')  
-    
+        torch.save(infer_model.state_dict(), file_name+'.pth')
+
+    H, W = ds.img.shape[-2], ds.img.shape[-1]
+    tile_size = args.image_size if args.image_size else 256
+    use_tiled = (H > tile_size * 2 or W > tile_size * 2)
+
+    if use_tiled:
+        print(f"Using tiled inference (tile={tile_size}, frame={H}x{W})")
+
     if four_dim:
         length = ds.img.shape[0]
         for k in range(len(ds)):
             with torch.no_grad():
                 a_idx = k % length
                 b_idx = k // length
-                o  = model(ds[k].unsqueeze(0))
+                if use_tiled:
+                    o = tiled_inference(infer_model, ds[k], tile_size, device)
+                else:
+                    o = infer_model(ds[k].unsqueeze(0))
                 o = o.cpu().numpy()
                 denoised[a_idx, b_idx] = o
     else:
         for k in range(len(ds)):
             with torch.no_grad():
-                o  = model(ds[k].unsqueeze(0))
+                if use_tiled:
+                    o = tiled_inference(infer_model, ds[k], tile_size, device)
+                else:
+                    o = infer_model(ds[k].unsqueeze(0))
                 o = o.cpu().numpy()
                 denoised[k] = o
+            if (k + 1) % 50 == 0:
+                print(f"  Denoised {k+1}/{len(ds)}")
 
     np.save(file_name+'.npy', denoised)
     print('Denoised Prediction Saved at '+ file_name+'.npy')
@@ -326,13 +390,19 @@ def main(args):
 
     tensor_noisy = torch.Tensor(raw_data).unsqueeze(1)
     tensor_denoised = torch.Tensor(denoised_data).unsqueeze(1)
-    uMSE, uPSNR = utils.uMSE_uPSNR(ds, model)
 
-    print('MSE: ', utils.mse(tensor_noisy, tensor_denoised))    
-    print('uMSE:', uMSE)
-    print('uPSNR:', uPSNR)
+    print('MSE: ', utils.mse(tensor_noisy, tensor_denoised))
     print('PSNR: ', utils.psnr(tensor_noisy, tensor_denoised))
     print('SSIM: ', utils.ssim(tensor_noisy, tensor_denoised))
+
+    try:
+        uMSE, uPSNR = utils.uMSE_uPSNR(ds, infer_model)
+        print('uMSE:', uMSE)
+        print('uPSNR:', uPSNR)
+    except RuntimeError as e:
+        if 'out of memory' in str(e):
+            torch.cuda.empty_cache()
+            print('uMSE/uPSNR: skipped (frames too large for GPU, use smaller --image-size for metrics)')
 
         
 
