@@ -1,0 +1,7 @@
+
+# Generated media / model artifacts
+*.mp4
+*.npy
+*.tif
+*.tiff
+*.pth
