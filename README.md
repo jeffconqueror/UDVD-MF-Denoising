@@ -1,151 +1,221 @@
-# Liquid-Cell TEM Particle Pipeline
+# Liquid-Cell TEM Nanoparticle Pipeline
 
-End-to-end automatic analysis pipeline for liquid-cell transmission electron microscopy (LC-TEM) videos:
+End-to-end analysis for liquid-cell / in-situ transmission electron microscopy (LC-TEM) videos of metal nanoparticles:
 
 ```
-raw AVI → drift correction → denoising → segmentation → tight particle crop
+raw AVI  →  drift correction  →  denoising  →  segmentation (optional)  →  structure classification
 ```
 
-This repository started as a fork of [UDVD-MF-Denoising](https://github.com/sreyas-mohan/udvd) (Science 2025) but has grown into a full pipeline that supports two self-supervised video denoisers — **[UDVD-MF](https://github.com/sreyas-mohan/udvd)** and **[UMVD](https://github.com/maryaiyetigbo/UMVD)** — and adds Gatan-DigitalMicrograph-inspired drift correction plus SAM 3 segmentation.
+Two self-supervised video denoisers are supported — **[UDVD-MF](https://github.com/sreyas-mohan/udvd)** (Science 2025) and **[UMVD](https://github.com/maryaiyetigbo/UMVD)** (CVPRW 2024). **UMVD is the default** (visually cleaner on LC-TEM data). The pipeline also adds Gatan-DigitalMicrograph-inspired drift correction, SAM 3 segmentation, and a Swin-Transformer nanoparticle-phase classifier (Dh / FCC / Ih).
 
-In our experiments **UMVD produces visually cleaner results on LC-TEM data**, so it is the default in the end-to-end pipeline.
+---
+
+## Contents
+1. [Install](#install)
+2. [Quick start](#quick-start)
+3. [Stage 1 — Drift correction](#stage-1--drift-correction)
+4. [Stage 2 — Denoising](#stage-2--denoising)
+5. [Stage 3 — Segmentation (optional)](#stage-3--segmentation-optional)
+6. [Stage 4 — Classification](#stage-4--classification)
+7. [Synthetic training data](#synthetic-training-data)
+8. [Key results](#key-results)
+9. [Repository layout](#repository-layout)
+
+---
+
+## Install
+
+Three conda environments (drift/segmentation, UMVD denoiser, SAM 3):
+
+```bash
+# (a) pipeline + drift correction + UDVD-MF
+conda env create -n denoise-HDR -f environment.yaml
+conda activate denoise-HDR
+pip install pystackreg scikit-image opencv-python-headless tifffile
+
+# (b) UMVD denoiser + classifier (torch + timm)
+conda create -n umvd python=3.11 -y && conda activate umvd
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+pip install timm tifffile scikit-image opencv-python-headless tqdm matplotlib pandas h5py imageio
+# synthetic data generation (optional): pip install abtem ase
+
+# (c) SAM 3 segmentation (Python >=3.12)
+conda create -n sam3 python=3.12 -y && conda activate sam3
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+git clone https://github.com/facebookresearch/sam3 ~/sam3 && cd ~/sam3 && pip install -e .
+pip install einops decord pycocotools psutil "numpy<2" tifffile opencv-python-headless scikit-image
+```
+
+Conda python paths are hard-coded at the top of `pipeline.py` — edit them if your install differs.
 
 ---
 
 ## Quick start
 
+**Single isolated particle (auto-detected), full pipeline in one command:**
 ```bash
-# One command — drift correct + denoise (transferred weights) + segment + 4× crop
 python pipeline.py --video /path/to/video.avi
+python pipeline.py --video /path/to/video.avi --finetune   # fine-tune UMVD 5 epochs first (better)
 ```
+Outputs land in `/shared/.../test/<video_name>/`: drift-corrected 512² stack, denoised `.npy` + comparison MP4, SAM 3 tight crop, and a `pipeline.log`.
 
-Outputs land in `/shared/jingchl6/material/lc-research/test/<video_name>/`:
-
-| File | Description |
-|------|-------------|
-| `tracked_*.tif/.mp4` | Drift-corrected, particle-centered 512×512 stack |
-| `denoised_*.npy/_comparison.mp4` | UMVD-denoised stack + raw\|denoised side-by-side |
-| `segcrop_*.tif/.mp4/_4x.mp4` | SAM 3 mask + tight 256×256 crop + 4× sped-up MP4 |
-| `pipeline.log` | Every command executed |
-
-Optional flags:
-
-| Flag | Purpose |
-|------|---------|
-| `--finetune` | Fine-tune UMVD 5 epochs on this video before denoising (~30 min, better quality) |
-| `--gpu <N>` | Pick a CUDA device (default 0) |
-| `--tcx --tcy` | Manually specify template center (override auto-detect) |
-| `--shrink <0–1>` | Crop tightness (default 0.6) |
+**Large aggregate / whole-field video** (many particles, structure drifts and restructures) — use the whole-field drift tool + UMVD directly (see stages below). `pipeline.py`'s template auto-detect is for a *single* particle and will not work on aggregates.
 
 ---
 
-## How it works (4 stages)
+## Stage 1 — Drift correction
 
-### 1. Drift correction — `track_generalized.py`
-- Auto-detects the particle in frame 0 by bandpass-NCC against a reference template extracted from a known good video (defaults to the 053243 chip).
-- Tracks the particle frame-by-frame using NCC on bandpass-filtered images — this preprocessing is the key trick from Gatan DigitalMicrograph's `ImageAlignment.dll` (cross-correlation alone fails; bandpass surfaces the nanoparticle lattice while suppressing noise).
-- Skips blurry transition frames (detected by Laplacian-variance drop).
-- Outputs a 512×512 crop centered on the tracked particle each frame.
+There are **two drift tools** — pick by what your video shows:
 
-### 2. Denoising — two options
-**Default (recommended, fast):** transfer-learned inference with frozen UMVD weights trained on a related video.
+### A. Single isolated particle → `track_generalized.py`
+Bandpass-NCC template tracking. Auto-detects the particle in frame 0 by matching a reference template, tracks it frame-by-frame, skips blurry frames, outputs a 512² crop centered on the particle.
 ```bash
-python /home/jingchl6/.local/UMVD/inference_lc.py \
-    --data tracked.tif --weights umvd_ts900/best_model.pth --output denoised.npy
+python track_generalized.py --video in.avi --tcx 885 --tcy 630 \
+    --off-x 200 --off-y 250 --template-size 900 --crop-size 512 --out tracked
 ```
-Takes about 1 minute for ~1000 frames.
+Requires the particle to resemble the reference template. **Fails on samples very different from the reference** (NCC ≈ 0 → random walk).
 
-**Fine-tune (better, slower):** 5 epochs starting from the same weights — usually matches a from-scratch 25-epoch training in quality.
+### B. Whole field / aggregate → `drift_correction.py`  (recommended for in-situ heating series)
+Fully automatic pystackreg (TurboReg) alignment of the entire frame — no template, no ROI. Includes the fixes that matter for noisy HRTEM:
+
 ```bash
-python /home/jingchl6/.local/UMVD/train_lc.py \
-    --data tracked.tif --output umvd_finetune \
+python drift_correction.py --input in.avi --output aligned.tif \
+    --reference first --bandpass --proc-res 1024 \
+    --moving-average 9 --median-window 11 --smooth-shifts 51
+```
+
+| Flag | What it does | Recommended |
+|------|--------------|-------------|
+| `--bandpass` | register on bandpass-filtered frames (surfaces the lattice; **raw cross-correlation fails on HRTEM**) | **always on** |
+| `--reference first` | align every frame to frame 0 (robust; `previous` accumulates error) | `first` |
+| `--proc-res 1024` | downscale to N×N for registration (2048² is too slow/heavy otherwise) | `1024` |
+| `--moving-average 9` | average N frames before registering — robust to noisy per-frame registration; **halves early-frame shake** on unstable footage | `9` |
+| `--median-window` | median pre-filter on the shift trajectory — rejects bad-frame **spikes** (single-frame jumps of 100–800 px) | `11` (clean) / `31` (very noisy) |
+| `--smooth-shifts` | Savitzky-Golay smoothing of the shift trajectory — removes residual **jitter** while keeping the real slow drift | `51` / `71` |
+
+**Why these flags exist:** raw pystackreg on HRTEM shakes badly. The two-stage trajectory smoothing (median → savgol) plus moving-average registration takes the max single-frame jump from ~250–870 px down to 3–5 px. Note: genuine fast sample motion (e.g. the first ~20 s of a heating ramp) is *real* and is intentionally preserved.
+
+Outputs: `aligned.tif`, a drift-trajectory plot, and a before/after comparison.
+
+---
+
+## Stage 2 — Denoising (UMVD)
+
+Input is the drift-corrected `.tif` stack. Two options — both live in the `UMVD/` repo (cloned separately).
+
+**(a) Transfer / frozen weights (fast, ~1 min per 1000 frames):**
+```bash
+python /path/to/UMVD/inference_lc.py \
+    --data aligned.tif --weights umvd_ts900/best_model.pth --output denoised.npy
+```
+
+**(b) Fine-tune on this video (better, ~30 min) — 5 epochs from the same init:**
+```bash
+python /path/to/UMVD/train_lc.py \
+    --data aligned.tif --output umvd_finetune \
     --init-weights umvd_ts900/best_model.pth \
-    --num-epochs 5 --batch-size 8 --image-size 128 --patience 0
+    --num-epochs 5 --batch-size 8 --image-size 128 --stride 128 --patience 0
+```
+For large (1024²) whole-field frames use `--stride 128` (fewer, non-overlapping patches) to keep training tractable. `train_lc.py` also writes the final full-frame `denoised.npy`.
+
+> If a fine-tune run diverges (rare) it can save a degenerate all-zero model → black output. Check `denoised.npy` has non-zero content; if black, re-run (it is a training instability, not a data problem).
+
+Make a small side-by-side viewing video (raw | transfer | fine-tune) at 128²:
+```bash
+python shrink_to_128.py --dir <video_folder> --name <name> --transfer-npy denoised.npy --size 128
 ```
 
-UDVD-MF is also available via `denoise_mf.py` / `denoise_inference.py` but produces visibly more over-smoothing on this data.
+---
 
-### 3. Segmentation — `seg_crop_speedup.py`
-- Runs [SAM 3](https://github.com/facebookresearch/sam3) in image mode with a central box prompt `[0.5, 0.5, 0.4, 0.4]` on each denoised frame.
-- Keeps only frames with a plausible mask (area 2k–80k px, score ≥ 0.3) — drops blurry / mis-tracked frames automatically.
-- Crops a square around the mask centroid (shrink factor, default 0.6) and resizes every kept frame to 256×256 — the particle fills the output.
-- Writes a 4× sped-up MP4 with libx264 (ffmpeg from `imageio_ffmpeg`).
+## Stage 3 — Segmentation (optional)
 
-### 4. Outputs
-Everything saved alongside the input video, plus a `pipeline.log` that reproduces the run.
+Only needed if you want a tight, particle-filling crop (e.g. before single-particle classification). SAM 3 with a central box prompt.
+```bash
+python seg_crop_speedup.py --input denoised.npy --output-dir out --name segcrop \
+    --min-area 5000 --max-area 600000 --shrink 0.6
+```
+The prompt is a fixed central box `[0.5, 0.5, 0.4, 0.4]` — great for a single centered particle, but it **wanders on aggregates** (no single persistent object). Raise `--box-size` or switch to a point/text prompt for those.
+
+---
+
+## Stage 4 — Classification
+
+Classifies each particle image into crystallographic phase. Code in `classifier/`.
+
+**Classes:** `Dh` (decahedron), `FCC`, `Ih` (icosahedron). `Ih` and `Ih→Dh` (transition) are **merged** — they are visually inseparable from a single frame, so the 4-class problem is really 3-class.
+
+**Best model + inference (96.6% val accuracy):**
+```bash
+# classify every frame of a denoised/segmented video, with 8-fold TTA (default)
+python classifier/classify_video.py --video segcrop.tif --output-dir out --gpu 0
+```
+`predict_stack(..., tta=True)` averages 8 dihedral views (4 rotations × flip) per frame. Rotations preserve crystallographic symmetry, so this is principled and adds ~+0.7 pt for free. It produces a per-frame label timeline (with temporal smoothing) + overlay video showing per-class confidences.
+
+**Train a classifier from scratch:**
+```bash
+python classifier/train.py --arch swin_tiny_patch4_window7_224 \
+    --epochs 30 --batch-size 64 --balance sampler+loss --mode merge-ihdh \
+    --splits-json splits_particle/splits.json --output runs/swin_merged
+```
+Key flags: `--mode {4class|merge-ihdh|drop-ihdh}`, `--data {real|synthetic|combined}`, `--init-weights <ckpt>` (warm-start — essential to escape the class-imbalance trivial minimum), `--amp`, `--aug-strength {normal|strong}`.
+
+**Splits are particle-level** (both frames of a particle stay on one side) via `dataset.py build_splits(by_particle=True)` — avoids train/val leakage.
+
+Evaluate + confusion matrix: `classifier/evaluate.py` (or `eval_best_tta.py` for the TTA best config).
+
+---
+
+## Synthetic training data
+
+Real labels are scarce, so you can generate physically-simulated HRTEM images with `abtem`:
+```bash
+python classifier/generate_synthetic.py --n-train 5000 --n-val 1000 --workers 32
+```
+Builds `ico` / `deca` / `fcc` nanoparticles (`three_struct_tilt_series.py` has the atomic models), simulates HRTEM with random tilt (x/y/z ∈ 0–90°), defocus, dose, and **random vacuum padding so the particle fills 40–95 % of the frame** (matches how real crops vary). Train with `--data synthetic`, or mix real+synth with `--data combined` (validate on real only).
+
+---
+
+## Key results
+
+| Task | Result | How |
+|------|--------|-----|
+| Classification (real Ag, particle-level val) | **96.62 %** | Swin-Tiny, 3-class merged, warm-started, **+ 8-fold TTA** |
+| — 4-class (with Ih→Dh) | 83 % | the Ih↔Ih→Dh boundary is a genuine single-frame ambiguity |
+| Denoising | UMVD > UDVD-MF | transfer ≈ fine-tune ≈ from-scratch on this data |
+| Drift (noisy heating video) | max single-frame jump 250–870 px → **3–5 px** | bandpass + median + savgol + moving-average=9 |
+
+Ensembling multiple classifier models was tested and **rejected** (weaker models drag the mean below the single best + TTA).
 
 ---
 
 ## Repository layout
 
-### Pipeline orchestration
-| Script | Purpose |
-|--------|---------|
-| `pipeline.py` | End-to-end runner — calls steps 1→4 automatically |
-| `track_generalized.py` | Stage 1: bandpass-NCC drift correction (template + offset) |
-| `denoise_inference.py` | Stage 2: UDVD-MF inference with frozen weights |
-| `seg_crop_speedup.py` | Stage 3+4: SAM 3 segmentation + tight crop + 4× speedup |
-
-### Stage-specific helpers
-| Script | Purpose |
-|--------|---------|
-| `drift_correction.py` | Standalone pystackreg-based drift correction (used early in development; superseded by `track_generalized.py`) |
-| `track_ts400.py`, `track_ts900.py` | Hard-coded template sizes used during method development |
-| `segment_sam3.py` | SAM 3 only (overlay video) — older, kept for reference |
-| `crop_mask.py`, `crop_mask_tight.py` | Cropping helpers used before `seg_crop_speedup.py` consolidated them |
-| `denoise_mf.py` | UDVD-MF training (from upstream Science 2025 repo) |
-| `denoised_to_video.py` | Convert any denoised .npy to a side-by-side comparison MP4 |
-| `visualize_denoise.py` | Static side-by-side plot helper |
-
-### Presentation / reference
+**Pipeline / drift**
 | File | Purpose |
 |------|---------|
-| `build_ppt.py` | Builds the slide deck from extracted frames |
-| `pipeline_presentation.pptx` | 11-slide deck explaining the pipeline |
-| `ImageAlignment.dll` | Reverse-engineering reference for the bandpass-NCC approach |
-| `check_fig1.png`, `check_fig2.png` | Paper reproduction sanity checks |
+| `pipeline.py` | one-command runner for a single particle (stages 1→3) |
+| `drift_correction.py` | whole-field automatic drift correction (bandpass + smoothing + moving-average) |
+| `track_generalized.py` | single-particle bandpass-NCC template tracking |
+| `seg_crop_speedup.py` | SAM 3 segmentation + tight crop + 4× speedup |
+| `shrink_to_128.py` | build small raw\|transfer\|fine-tune comparison videos |
 
-### Model / utility code (from upstream UDVD-MF)
-| Folder | Purpose |
-|--------|---------|
-| `models/` | UDVD-MF model definitions |
-| `utils/` | Loss, metrics, progress bars |
-| `data.py` | Dataset loaders |
-| `calculate_corr.py` | Temporal correlation analysis |
+**Classifier (`classifier/`)**
+| File | Purpose |
+|------|---------|
+| `train.py` | train Swin/ResNet/DINOv2; modes 4class / merge-ihdh / drop-ihdh; data real / synthetic / combined |
+| `dataset.py` / `dataset_synthetic.py` / `dataset_combined.py` | particle-level splits + loaders |
+| `classify_video.py` | apply classifier to a video with TTA + temporal smoothing → phase timeline |
+| `evaluate.py` / `eval_best_tta.py` / `eval_tta_ensemble.py` | val metrics, confusion matrices, TTA/ensemble sweep |
+| `generate_synthetic.py` | abtem HRTEM simulation of ico/deca/fcc particles |
+| `threshold_sweep.py`, `relabel_ih_to_dh.py`, `test_pad_predict.py` | analysis / ablation helpers |
 
----
-
-## Environment
-
-Two conda environments are used. Both are needed for the end-to-end pipeline.
-
-```bash
-# UDVD-MF environment (also hosts our pipeline scripts)
-conda env create -n denoise-HDR -f environment.yaml
-
-# UMVD environment — clone https://github.com/maryaiyetigbo/UMVD
-git clone https://github.com/maryaiyetigbo/UMVD ~/UMVD
-conda create -n umvd python=3.11 -y
-conda activate umvd
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
-pip install tifffile pytorch-msssim scikit-image tqdm matplotlib h5py imageio pandas opencv-python-headless
-
-# SAM 3 environment (Python ≥3.12, PyTorch 2.6+)
-conda create -n sam3 python=3.12 -y
-conda activate sam3
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
-git clone https://github.com/facebookresearch/sam3 ~/sam3
-cd ~/sam3 && pip install -e .
-pip install einops decord pycocotools psutil "numpy<2" tifffile matplotlib opencv-python-headless scikit-image
-```
-
-`pipeline.py` hardcodes the conda environment Python paths at the top of the file; edit those constants if your install differs.
+**Model / util code** is inherited from upstream UDVD-MF (`models/`, `utils/`, `data.py`).
 
 ---
 
 ## Citations
-
-- **UDVD-MF** (`denoise_mf.py`, `models/`): Mohan et al., "Visualizing nanoparticle surface dynamics and instabilities enabled by deep denoising", Science 2025.
-- **UMVD**: Aiyetigbo et al., "Unsupervised microscopy video denoising", CVPR 2024 Workshop. https://github.com/maryaiyetigbo/UMVD
+- **UDVD-MF**: Mohan et al., "Visualizing nanoparticle surface dynamics and instabilities enabled by deep denoising," *Science* 2025.
+- **UMVD**: Aiyetigbo et al., "Unsupervised microscopy video denoising," *CVPRW* 2024. https://github.com/maryaiyetigbo/UMVD
 - **SAM 3**: Meta AI, 2025. https://github.com/facebookresearch/sam3
-- **DigitalMicrograph / Gatan ImageAlignment** — bandpass-NCC drift correction approach inspired by reverse-engineering `ImageAlignment.dll` (commercial software, not redistributed).
+- **abtem**: Madsen & Susi, "The abTEM code: transmission electron microscopy from first principles," 2021.
+- **Drift correction** — bandpass-NCC approach inspired by Gatan DigitalMicrograph's `ImageAlignment.dll` (not redistributed).

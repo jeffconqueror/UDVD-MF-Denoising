@@ -59,37 +59,66 @@ def read_video_frames(path, start=0, end=-1, resize=None):
     return np.array(frames, dtype=np.uint8), fps
 
 
-def drift_correct(frames, reference='first'):
+def _bandpass(img, low=1.5, high=15.0):
+    """Gatan-style bandpass: surfaces the lattice, suppresses noise (README's key trick)."""
+    img = img.astype(np.float32)
+    kl = max(3, int(6*low) | 1); kh = max(3, int(6*high) | 1)
+    bp = cv2.GaussianBlur(img, (kl, kl), low) - cv2.GaussianBlur(img, (kh, kh), high)
+    return cv2.normalize(bp, None, 0, 255, cv2.NORM_MINMAX)
+
+
+def drift_correct(frames, reference='first', bandpass=False, smooth_window=0, median_window=11, moving_average=1):
     """
     Align all frames using pystackreg (TurboReg TRANSLATION mode).
 
     Args:
         frames    : (T, H, W) uint8
-        reference : 'first'    — all frames aligned to frame 0
+        reference : 'first'    — all frames aligned to frame 0 (robust, no accumulation)
                     'previous' — each frame aligned to the previous one
-                                 (better for large cumulative drift)
+        bandpass  : register on bandpass-filtered frames (essential for HRTEM)
+        smooth_window : if >0, Savitzky-Golay smooth the shift trajectory before applying.
+                    Removes per-frame registration jitter ("shake") while keeping the
+                    slow physical drift. Use an odd window (~15-31 frames).
     Returns:
         aligned : (T, H, W) float32
-        shifts  : (T, 2) float32  [row_shift, col_shift]
+        shifts  : (T, 2) float32  [tx, ty] (after smoothing if enabled)
     """
-    print(f"Running pystackreg (TRANSLATION, reference='{reference}')...")
+    print(f"Running pystackreg (TRANSLATION, reference='{reference}', bandpass={bandpass}, smooth={smooth_window})...")
     sr = StackReg(StackReg.TRANSLATION)
 
-    # register_transform_stack does registration + transformation in one call
-    aligned = sr.register_transform_stack(
-        frames.astype(np.float32),
-        reference=reference,
-        verbose=True
-    )
+    ff = frames.astype(np.float32)
+    reg_input = ff
+    if bandpass:
+        print("  Bandpass-filtering frames for registration...")
+        reg_input = np.stack([_bandpass(f) for f in frames]).astype(np.float32)
 
-    # Extract shifts from the stored transformation matrices
-    tmats = sr._tmats   # (3, 3) of last frame — need to re-register for all
-    # Re-register to get all matrices
-    tmats_all = sr.register_stack(
-        frames.astype(np.float32),
-        reference=reference,
-        verbose=False
-    )
+    # Register on (optionally bandpass) frames to get the per-frame transforms.
+    tmats_all = sr.register_stack(reg_input, reference=reference, moving_average=moving_average, verbose=True)
+
+    # --- Smooth the shift trajectory to kill per-frame jitter + spikes (the "shake") ---
+    if smooth_window and smooth_window > 2:
+        from scipy.signal import savgol_filter, medfilt
+        w = int(smooth_window) | 1                       # force odd
+        w = min(w, (len(tmats_all) // 2) * 2 - 1)        # not larger than data
+        po = min(2, w - 1)
+        mw = min(median_window, (len(tmats_all) // 2) * 2 - 1) | 1  # median pre-filter window (odd)
+        tx = tmats_all[:, 0, 2].copy()
+        ty = tmats_all[:, 1, 2].copy()
+        # 1) median filter rejects spike outliers (bad-frame registration failures)
+        tx_m = medfilt(tx, mw); ty_m = medfilt(ty, mw)
+        # 2) savgol smooths the remaining jitter, keeping the slow drift trend
+        tx_s = savgol_filter(tx_m, w, po)
+        ty_s = savgol_filter(ty_m, w, po)
+        print(f"  Smoothed shift trajectory (median={mw} + savgol={w}): "
+              f"jitter tx {np.std(np.diff(tx)):.2f}->{np.std(np.diff(tx_s)):.2f}px, "
+              f"ty {np.std(np.diff(ty)):.2f}->{np.std(np.diff(ty_s)):.2f}px; "
+              f"max-step tx {np.abs(np.diff(tx)).max():.1f}->{np.abs(np.diff(tx_s)).max():.1f}px, "
+              f"ty {np.abs(np.diff(ty)).max():.1f}->{np.abs(np.diff(ty_s)).max():.1f}px")
+        tmats_all[:, 0, 2] = tx_s
+        tmats_all[:, 1, 2] = ty_s
+        sr._tmats = tmats_all                            # use smoothed transforms
+
+    aligned = sr.transform_stack(ff)            # apply (smoothed) tmats to raw frames
     shifts = tmats_all[:, :2, 2].copy()
 
     return aligned.astype(np.float32), shifts
@@ -162,12 +191,14 @@ def main(args):
     out_dir  = out_path.parent
     out_stem = out_path.stem
 
-    # 1. Read frames
-    frames, fps = read_video_frames(args.input, args.start, args.end)
+    # 1. Read frames (optionally downscale during read for tractable registration)
+    frames, fps = read_video_frames(args.input, args.start, args.end, resize=args.proc_res)
     print(f"Loaded {len(frames)} frames  shape={frames.shape}\n")
 
     # 2. Drift correct (register + transform in one call)
-    aligned, shifts = drift_correct(frames, reference=args.reference)
+    aligned, shifts = drift_correct(frames, reference=args.reference, bandpass=args.bandpass,
+                                    smooth_window=args.smooth_shifts, median_window=args.median_window,
+                                    moving_average=args.moving_average)
 
     # 3. Clip and optionally downscale
     aligned_clipped = np.clip(aligned, 0, 255).astype(np.float32)
@@ -232,7 +263,20 @@ def get_args():
     parser.add_argument('--end',       default=-1, type=int,
                         help='End frame index, -1 = all (default: -1)')
     parser.add_argument('--resize',    default=None, type=int,
-                        help='Resize frames to NxN (e.g. 512)')
+                        help='Resize OUTPUT stack to NxN (post-alignment)')
+    parser.add_argument('--proc-res',  default=None, type=int,
+                        help='Downscale frames to NxN during READ so registration runs at this '
+                             'resolution (big speedup for 2048-px videos, e.g. 1024)')
+    parser.add_argument('--bandpass',  action='store_true',
+                        help='Register on bandpass-filtered frames (essential for HRTEM; '
+                             'raw cross-correlation fails per the README)')
+    parser.add_argument('--moving-average', default=1, type=int,
+                        help='average N frames before registration (robust to noisy per-frame reg; 9 recommended)')
+    parser.add_argument('--median-window', default=11, type=int,
+                        help='median pre-filter window for spike rejection (wider for noisy videos)')
+    parser.add_argument('--smooth-shifts', default=0, type=int,
+                        help='Savitzky-Golay smooth the shift trajectory (odd window ~15-31) '
+                             'to remove per-frame jitter/shake while keeping the slow drift')
     return parser.parse_args()
 
 

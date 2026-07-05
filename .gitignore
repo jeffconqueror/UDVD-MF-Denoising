@@ -1,7 +1,16 @@
-
-# Generated media / model artifacts
+# Generated media / model artifacts / data
 *.mp4
 *.npy
 *.tif
 *.tiff
 *.pth
+*.pptx
+*.avi
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Experiment outputs (images, sample data) — code only in the repo
+results/
+class_comparison/
