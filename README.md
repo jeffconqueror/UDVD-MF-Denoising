@@ -19,9 +19,10 @@ datasets, the results tables, and a stage-by-stage citation guide:
 |---|---|
 | **[docs/PIPELINE_METHODS.md](docs/PIPELINE_METHODS.md)** | Detailed methods section (drift → denoising → segmentation → classification), results, limitations, and what to cite for each stage |
 | **[docs/references.bib](docs/references.bib)** | BibTeX for every citation |
-| **[Figure 1](docs/figures/fig1_pipeline.png)** ([SVG](docs/figures/fig1_pipeline.svg)) | The whole pipeline: 4 stages, data shapes, training data, headline results |
-| **[Figure 2](docs/figures/fig2_classifier.png)** ([SVG](docs/figures/fig2_classifier.svg)) | The classifier: Swin-Tiny backbone, 8-fold dihedral TTA, temporal post-processing |
+| **[Figure 1](docs/figures/fig1_pipeline.png)** ([SVG](docs/figures/fig1_pipeline.svg)) | Pipeline as a network graph — real data tensors at every stage, the UMVD denoiser expanded inline (blind-frame mask, U-Net, self-supervised loss), and the four sub-networks expanded below |
+| **[Figure 2](docs/figures/fig2_classifier.png)** ([SVG](docs/figures/fig2_classifier.svg)) | Classifier as a network graph — Swin-Tiny drawn as feature volumes, dihedral TTA, Swin block internals, W-MSA vs SW-MSA, and the three classes |
 | `docs/figures/make_figures.py` | Regenerates both figures (no dependencies; SVG is editable in Inkscape/Illustrator) |
+| `docs/figures/make_thumbnails.py` | Re-extracts the real frame thumbnails from `/shared` into `docs/figures/assets/` |
 
 ![Pipeline](docs/figures/fig1_pipeline.png)
 
@@ -198,10 +199,12 @@ Builds `ico` / `deca` / `fcc` nanoparticles (`three_struct_tilt_series.py` has t
 |------|--------|-----|
 | Classification (real Ag, particle-level val) | **96.62 %** | Swin-Tiny, 3-class merged, warm-started, **+ 8-fold TTA** |
 | — 4-class (with Ih→Dh) | 83 % | the Ih↔Ih→Dh boundary is a genuine single-frame ambiguity |
-| Denoising | UMVD > UDVD-MF | transfer ≈ fine-tune ≈ from-scratch on this data |
+| Denoising | UMVD > UDVD-MF (**visual only** — see caveat below) | transfer ≈ fine-tune ≈ from-scratch on this data |
 | Drift (noisy heating video) | max single-frame jump 250–870 px → **3–5 px** | bandpass + median + savgol + moving-average=9 |
 
 Ensembling multiple classifier models was tested and **rejected** (weaker models drag the mean below the single best + TTA).
+
+> **Caveat on "UMVD > UDVD-MF".** This is a visual judgement, not a measurement. Only UDVD-MF has uPSNR recorded (pass-1 23.86, pass-2 28.64); UMVD has only its self-supervised `val_loss` (0.014519), which is not a quality metric. The PSNR/SSIM figures in the old slide deck are computed against the **noisy input**, so a higher value means *less* denoising — don't quote them. To make the comparison publishable, run `utils/metrics.py:uMSE_uPSNR` on both models over the same frames. See [docs/PIPELINE_METHODS.md §6](docs/PIPELINE_METHODS.md#6-results).
 
 ---
 
@@ -234,8 +237,10 @@ Ensembling multiple classifier models was tested and **rejected** (weaker models
 | `PIPELINE_METHODS.md` | full paper-ready methods write-up + results + citation guide |
 | `references.bib` | BibTeX for every citation |
 | `figures/make_figures.py` | regenerates Figures 1 and 2 as SVG |
-| `figures/fig1_pipeline.svg/.png` | Figure 1 — the whole pipeline |
-| `figures/fig2_classifier.svg/.png` | Figure 2 — the classifier architecture |
+| `figures/make_thumbnails.py` | extracts the real frame thumbnails the figures embed |
+| `figures/assets/` | those thumbnails (real frames, one per pipeline stage) |
+| `figures/fig1_pipeline.svg/.png` | Figure 1 — pipeline network graph |
+| `figures/fig2_classifier.svg/.png` | Figure 2 — classifier network graph |
 
 ---
 
