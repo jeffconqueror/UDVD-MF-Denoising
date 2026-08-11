@@ -6,7 +6,24 @@ End-to-end analysis for liquid-cell / in-situ transmission electron microscopy (
 raw AVI  →  drift correction  →  denoising  →  segmentation (optional)  →  structure classification
 ```
 
-Two self-supervised video denoisers are supported — **[UDVD-MF](https://github.com/sreyas-mohan/udvd)** (Science 2025) and **[UMVD](https://github.com/maryaiyetigbo/UMVD)** (CVPRW 2024). **UMVD is the default** (visually cleaner on LC-TEM data). The pipeline also adds Gatan-DigitalMicrograph-inspired drift correction, SAM 3 segmentation, and a Swin-Transformer nanoparticle-phase classifier (Dh / FCC / Ih).
+Two self-supervised video denoisers are supported — **[UDVD-MF](https://github.com/sreyas-mohan/udvd)** (ICCV 2021; applied to TEM in Science 2025) and **[UMVD](https://github.com/maryaiyetigbo/UMVD)** (CVPRW 2024). **UMVD is the default** (visually cleaner on LC-TEM data): it masks a whole *frame* rather than a spatial blind spot, so it keeps full spatial resolution at the lattice-fringe scale. The pipeline also adds Gatan-DigitalMicrograph-inspired drift correction, SAM 3 segmentation, and a Swin-Transformer nanoparticle-phase classifier (Dh / FCC / Ih).
+
+---
+
+## Paper documentation
+
+Full, paper-ready write-up of the pipeline — every stage, every hyper-parameter, the
+datasets, the results tables, and a stage-by-stage citation guide:
+
+| | |
+|---|---|
+| **[docs/PIPELINE_METHODS.md](docs/PIPELINE_METHODS.md)** | Detailed methods section (drift → denoising → segmentation → classification), results, limitations, and what to cite for each stage |
+| **[docs/references.bib](docs/references.bib)** | BibTeX for every citation |
+| **[Figure 1](docs/figures/fig1_pipeline.png)** ([SVG](docs/figures/fig1_pipeline.svg)) | The whole pipeline: 4 stages, data shapes, training data, headline results |
+| **[Figure 2](docs/figures/fig2_classifier.png)** ([SVG](docs/figures/fig2_classifier.svg)) | The classifier: Swin-Tiny backbone, 8-fold dihedral TTA, temporal post-processing |
+| `docs/figures/make_figures.py` | Regenerates both figures (no dependencies; SVG is editable in Inkscape/Illustrator) |
+
+![Pipeline](docs/figures/fig1_pipeline.png)
 
 ---
 
@@ -211,11 +228,31 @@ Ensembling multiple classifier models was tested and **rejected** (weaker models
 
 **Model / util code** is inherited from upstream UDVD-MF (`models/`, `utils/`, `data.py`).
 
+**Documentation (`docs/`)**
+| File | Purpose |
+|------|---------|
+| `PIPELINE_METHODS.md` | full paper-ready methods write-up + results + citation guide |
+| `references.bib` | BibTeX for every citation |
+| `figures/make_figures.py` | regenerates Figures 1 and 2 as SVG |
+| `figures/fig1_pipeline.svg/.png` | Figure 1 — the whole pipeline |
+| `figures/fig2_classifier.svg/.png` | Figure 2 — the classifier architecture |
+
 ---
 
 ## Citations
-- **UDVD-MF**: Mohan et al., "Visualizing nanoparticle surface dynamics and instabilities enabled by deep denoising," *Science* 2025.
-- **UMVD**: Aiyetigbo et al., "Unsupervised microscopy video denoising," *CVPRW* 2024. https://github.com/maryaiyetigbo/UMVD
-- **SAM 3**: Meta AI, 2025. https://github.com/facebookresearch/sam3
-- **abtem**: Madsen & Susi, "The abTEM code: transmission electron microscopy from first principles," 2021.
-- **Drift correction** — bandpass-NCC approach inspired by Gatan DigitalMicrograph's `ImageAlignment.dll` (not redistributed).
+
+BibTeX for all of these: **[docs/references.bib](docs/references.bib)**. Which entry belongs
+to which stage: **[docs/PIPELINE_METHODS.md §8](docs/PIPELINE_METHODS.md#8-what-to-cite-stage-by-stage)**.
+
+**Denoising stage — cite these**
+- **UMVD** (the denoiser actually used): Aiyetigbo, Korte, Anderson, Chalhoub, Kalivas, Luo & Li, "Unsupervised Microscopy Video Denoising," *CVPRW* 2024. [arXiv:2404.12163](https://arxiv.org/abs/2404.12163) · https://github.com/maryaiyetigbo/UMVD
+- **UDVD** (baseline; the upstream code base of this repo): Sheth, Mohan, Vincent, Manzorro, Crozier, Khapra, Simoncelli & Fernandez-Granda, "Unsupervised Deep Video Denoising," *ICCV* 2021, pp. 1759–1768. [arXiv:2011.15045](https://arxiv.org/abs/2011.15045)
+- **Application precedent**: Crozier, Leibovich, Haluai, Tan, Thomas, Vincent, Mohan, Marcos Morales, Kulkarni, Matteson, Wang & Fernandez-Granda, "Visualizing nanoparticle surface dynamics and instabilities enabled by deep denoising," *Science* **387**(6737), 949–954 (2025). [doi:10.1126/science.ads2688](https://doi.org/10.1126/science.ads2688)
+- **Evaluating a denoiser without ground truth**: Marcos Morales et al., "Evaluating Unsupervised Denoising Requires Unsupervised Metrics," *ICML* 2023, PMLR 202, 23937–23957. [arXiv:2210.05553](https://arxiv.org/abs/2210.05553)
+- **Theory behind the self-supervision**: Lehtinen et al., *Noise2Noise*, ICML 2018; Krull et al., *Noise2Void*, CVPR 2019; Laine et al., *High-Quality Self-Supervised Deep Image Denoising*, NeurIPS 2019.
+
+**Other stages**
+- **Drift correction**: Thévenaz, Ruttimann & Unser, "A Pyramid Approach to Subpixel Registration Based on Intensity," *IEEE TIP* **7**(1), 27–41 (1998) — the TurboReg algorithm behind `pystackreg`; Savitzky & Golay, *Anal. Chem.* **36**, 1627 (1964). The bandpass-then-cross-correlate convention is inspired by Gatan DigitalMicrograph's `ImageAlignment.dll` (not redistributed).
+- **SAM 3**: Carion et al., "SAM 3: Segment Anything with Concepts," [arXiv:2511.16719](https://arxiv.org/abs/2511.16719) (2025). https://github.com/facebookresearch/sam3
+- **Classifier**: Liu et al., "Swin Transformer," *ICCV* 2021; Wightman, `timm` (2019); Loshchilov & Hutter (AdamW, cosine annealing); Szegedy et al. (label smoothing).
+- **Synthetic data**: Madsen & Susi, "The abTEM code: transmission electron microscopy from first principles," *Open Res. Europe* **1**, 24 (2021); Kirkland, *Advanced Computing in Electron Microscopy* (scattering-factor parametrization); Larsen et al., ASE, *J. Phys. Condens. Matter* **29**, 273002 (2017).

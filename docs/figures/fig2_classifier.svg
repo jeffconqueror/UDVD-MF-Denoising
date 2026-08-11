@@ -1,0 +1,275 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1680" height="1000" viewBox="0 0 1680 1000" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif">
+<title>Figure 2 — Swin-Tiny phase classifier with dihedral TTA</title>
+<defs>
+  <marker id="arrowhead" markerWidth="9" markerHeight="9" refX="7.4" refY="3.2"
+          orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L7.6,3.2 L0,6.4 z" fill="#6b747d"/>
+  </marker>
+  <marker id="arrowhead_k" markerWidth="9" markerHeight="9" refX="7.4" refY="3.2"
+          orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L7.6,3.2 L0,6.4 z" fill="#16191d"/>
+  </marker>
+  <marker id="arrowhead_p" markerWidth="9" markerHeight="9" refX="7.4" refY="3.2"
+          orient="auto" markerUnits="strokeWidth">
+    <path d="M0,0 L7.6,3.2 L0,6.4 z" fill="#6a4c9c"/>
+  </marker>
+</defs>
+<rect width="1680" height="1000" fill="#ffffff"/>
+<text x="40" y="46" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="21" fill="#16191d" font-weight="700" text-anchor="start">Figure 2  |  Stage-4 classifier: Swin-Tiny with dihedral test-time augmentation and temporal post-processing</text>
+<text x="40" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" fill="#6b747d" font-weight="400" text-anchor="start">One 256 × 256 segmented crop per frame  →  8 equivalent views  →  Swin-Tiny  →  averaged posterior  →  median-smoothed phase timeline</text>
+<line x1="40" y1="88" x2="1640" y2="88" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<rect x="40" y="190" width="150" height="180" rx="10" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="115" y="216" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="700" text-anchor="middle" letter-spacing="1.2">INPUT</text>
+<rect x="70" y="228" width="90" height="90" rx="4" fill="#2b2f35" stroke="#0f1216" stroke-width="1"/>
+<circle cx="115" cy="273" r="30" fill="#8d949c" stroke="none" stroke-width="1"/>
+<circle cx="115" cy="273" r="30" fill="none" stroke="#e4e8ec" stroke-width="1.5"/>
+<line x1="89" y1="249" x2="141" y2="249" stroke="#cfd4da" stroke-width="0.8" stroke-linecap="round"/>
+<line x1="89" y1="257" x2="141" y2="257" stroke="#cfd4da" stroke-width="0.8" stroke-linecap="round"/>
+<line x1="89" y1="265" x2="141" y2="265" stroke="#cfd4da" stroke-width="0.8" stroke-linecap="round"/>
+<line x1="89" y1="273" x2="141" y2="273" stroke="#cfd4da" stroke-width="0.8" stroke-linecap="round"/>
+<line x1="89" y1="281" x2="141" y2="281" stroke="#cfd4da" stroke-width="0.8" stroke-linecap="round"/>
+<line x1="89" y1="289" x2="141" y2="289" stroke="#cfd4da" stroke-width="0.8" stroke-linecap="round"/>
+<line x1="89" y1="297" x2="141" y2="297" stroke="#cfd4da" stroke-width="0.8" stroke-linecap="round"/>
+<text x="115" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11" fill="#16191d" font-weight="600" text-anchor="middle">segcrop frame</text>
+<text x="115" y="354" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="middle">256 × 256, uint8</text>
+<rect x="215" y="190" width="180" height="180" rx="10" fill="#ffffff" stroke="#d6dbe0" stroke-width="1"/>
+<text x="231" y="216" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="700" text-anchor="start" letter-spacing="1.2">PREPROCESS</text>
+<text x="231" y="242" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#16191d" font-weight="600" text-anchor="start">Resize → 256</text><text x="231" y="257" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">CenterCrop → 224 × 224</text><text x="231" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#16191d" font-weight="600" text-anchor="start">Grayscale → RGB</text><text x="231" y="287" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">replicate 1 ch → 3 ch so the</text><text x="231" y="302" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">ImageNet weights apply as-is</text><text x="231" y="317" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#16191d" font-weight="600" text-anchor="start">ImageNet normalisation</text><text x="231" y="332" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">μ = .485/.456/.406</text><text x="231" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">σ = .229/.224/.225</text>
+<rect x="420" y="190" width="150" height="180" rx="10" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="1"/>
+<text x="495.0" y="216" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6a4c9c" font-weight="700" text-anchor="middle" letter-spacing="1.2">8-FOLD TTA</text>
+<rect x="442" y="238" width="22" height="22" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="1"/>
+<line x1="446" y1="256" x2="460" y2="256" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="453" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.5" fill="#6a4c9c" font-weight="400" text-anchor="middle">0°</text>
+<rect x="470" y="238" width="22" height="22" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="1"/>
+<line x1="474" y1="256" x2="488" y2="256" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="481" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.5" fill="#6a4c9c" font-weight="400" text-anchor="middle">90°</text>
+<rect x="498" y="238" width="22" height="22" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="1"/>
+<line x1="502" y1="256" x2="516" y2="256" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="509" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.5" fill="#6a4c9c" font-weight="400" text-anchor="middle">180°</text>
+<rect x="526" y="238" width="22" height="22" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="1"/>
+<line x1="530" y1="256" x2="544" y2="256" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="537" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.5" fill="#6a4c9c" font-weight="400" text-anchor="middle">270°</text>
+<rect x="442" y="272" width="22" height="22" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="1"/>
+<line x1="446" y1="290" x2="460" y2="290" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="453" y="306" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.5" fill="#6a4c9c" font-weight="400" text-anchor="middle">⇄0°</text>
+<rect x="470" y="272" width="22" height="22" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="1"/>
+<line x1="474" y1="290" x2="488" y2="290" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="481" y="306" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.5" fill="#6a4c9c" font-weight="400" text-anchor="middle">⇄90°</text>
+<rect x="498" y="272" width="22" height="22" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="1"/>
+<line x1="502" y1="290" x2="516" y2="290" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="509" y="306" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.5" fill="#6a4c9c" font-weight="400" text-anchor="middle">⇄180°</text>
+<rect x="526" y="272" width="22" height="22" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="1"/>
+<line x1="530" y1="290" x2="544" y2="290" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round"/>
+<text x="537" y="306" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.5" fill="#6a4c9c" font-weight="400" text-anchor="middle">⇄270°</text>
+<text x="495.0" y="334" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="middle">dihedral group D₄</text>
+<text x="495.0" y="350" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="middle">4 rotations × flip</text>
+<text x="495.0" y="366" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="middle">shared weights</text>
+<rect x="595" y="120" width="780" height="320" rx="12" fill="#ffffff" stroke="#d6dbe0" stroke-width="1"/>
+<path d="M595,132 a12,12 0 0 1 12,-12 h756 a12,12 0 0 1 12,12 v30 h-780 z" fill="#f1ecf9"/>
+<line x1="595" y1="162" x2="1375" y2="162" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="611" y="147" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13.5" fill="#16191d" font-weight="700" text-anchor="start">Swin-Tiny backbone</text>
+<text x="771" y="147" font-family="'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="10" fill="#6b747d" font-weight="400" text-anchor="start">swin_tiny_patch4_window7_224 · ImageNet-1k pretrained · 27.5 M params</text>
+<rect x="609" y="182" width="96" height="200" rx="8" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="657.0" y="208" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11" fill="#16191d" font-weight="700" text-anchor="middle">Patch</text>
+<text x="657.0" y="223" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11" fill="#16191d" font-weight="700" text-anchor="middle">Embed</text>
+<text x="657.0" y="246" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">4 × 4 conv</text>
+<text x="657.0" y="261" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">stride 4</text>
+<line x1="623" y1="276" x2="691" y2="276" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="657.0" y="296" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="middle">224 × 224</text>
+<text x="657.0" y="311" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11" fill="#6b747d" font-weight="400" text-anchor="middle">↓</text>
+<text x="657.0" y="328" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#6a4c9c" font-weight="700" text-anchor="middle">56 × 56</text>
+<text x="657.0" y="344" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#6a4c9c" font-weight="700" text-anchor="middle">× 96 ch</text>
+<rect x="719" y="182" width="154" height="200" rx="8" fill="#ffffff" stroke="#6a4c9c" stroke-width="1.3"/>
+<rect x="719" y="182" width="154" height="26" rx="8" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<rect x="719" y="200" width="154" height="8" rx="0" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<text x="731" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11.5" fill="#16191d" font-weight="700" text-anchor="start">Stage 1</text>
+<text x="861" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6a4c9c" font-weight="600" text-anchor="end">2 blocks</text>
+<rect x="731" y="220" width="130" height="16" rx="3" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="796.0" y="231.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9" fill="#6a4c9c" font-weight="600" text-anchor="middle">W-MSA</text>
+<rect x="731" y="240" width="130" height="16" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="796.0" y="251.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9" fill="#6a4c9c" font-weight="600" text-anchor="middle">SW-MSA</text>
+<line x1="731" y1="310" x2="861" y2="310" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="731" y="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">tokens</text>
+<text x="861" y="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">56 × 56</text>
+<text x="731" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">dim</text>
+<text x="861" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">96</text>
+<text x="731" y="364" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">attn</text>
+<text x="861" y="364" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">3 heads</text>
+<line x1="874" y1="282" x2="882" y2="282" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<text x="878.0" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="8" fill="#6a4c9c" font-weight="700" text-anchor="middle">↓2</text>
+<rect x="883" y="182" width="154" height="200" rx="8" fill="#ffffff" stroke="#6a4c9c" stroke-width="1.3"/>
+<rect x="883" y="182" width="154" height="26" rx="8" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<rect x="883" y="200" width="154" height="8" rx="0" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<text x="895" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11.5" fill="#16191d" font-weight="700" text-anchor="start">Stage 2</text>
+<text x="1025" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6a4c9c" font-weight="600" text-anchor="end">2 blocks</text>
+<rect x="895" y="220" width="130" height="16" rx="3" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="960.0" y="231.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9" fill="#6a4c9c" font-weight="600" text-anchor="middle">W-MSA</text>
+<rect x="895" y="240" width="130" height="16" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="960.0" y="251.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9" fill="#6a4c9c" font-weight="600" text-anchor="middle">SW-MSA</text>
+<line x1="895" y1="310" x2="1025" y2="310" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="895" y="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">tokens</text>
+<text x="1025" y="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">28 × 28</text>
+<text x="895" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">dim</text>
+<text x="1025" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">192</text>
+<text x="895" y="364" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">attn</text>
+<text x="1025" y="364" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">6 heads</text>
+<line x1="1038" y1="282" x2="1046" y2="282" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<text x="1042.0" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="8" fill="#6a4c9c" font-weight="700" text-anchor="middle">↓2</text>
+<rect x="1047" y="182" width="154" height="200" rx="8" fill="#ffffff" stroke="#6a4c9c" stroke-width="1.3"/>
+<rect x="1047" y="182" width="154" height="26" rx="8" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<rect x="1047" y="200" width="154" height="8" rx="0" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<text x="1059" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11.5" fill="#16191d" font-weight="700" text-anchor="start">Stage 3</text>
+<text x="1189" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6a4c9c" font-weight="600" text-anchor="end">6 blocks</text>
+<rect x="1059" y="220" width="130" height="11" rx="3" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="1124.0" y="228" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.8" fill="#6a4c9c" font-weight="600" text-anchor="middle">W-MSA</text>
+<rect x="1059" y="233" width="130" height="11" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="1124.0" y="241" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.8" fill="#6a4c9c" font-weight="600" text-anchor="middle">SW-MSA</text>
+<rect x="1059" y="246" width="130" height="11" rx="3" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="1124.0" y="254" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.8" fill="#6a4c9c" font-weight="600" text-anchor="middle">W-MSA</text>
+<rect x="1059" y="259" width="130" height="11" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="1124.0" y="267" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.8" fill="#6a4c9c" font-weight="600" text-anchor="middle">SW-MSA</text>
+<rect x="1059" y="272" width="130" height="11" rx="3" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="1124.0" y="280" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.8" fill="#6a4c9c" font-weight="600" text-anchor="middle">W-MSA</text>
+<rect x="1059" y="285" width="130" height="11" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="1124.0" y="293" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="7.8" fill="#6a4c9c" font-weight="600" text-anchor="middle">SW-MSA</text>
+<line x1="1059" y1="310" x2="1189" y2="310" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="1059" y="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">tokens</text>
+<text x="1189" y="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">14 × 14</text>
+<text x="1059" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">dim</text>
+<text x="1189" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">384</text>
+<text x="1059" y="364" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">attn</text>
+<text x="1189" y="364" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">12 heads</text>
+<line x1="1202" y1="282" x2="1210" y2="282" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<text x="1206.0" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="8" fill="#6a4c9c" font-weight="700" text-anchor="middle">↓2</text>
+<rect x="1211" y="182" width="154" height="200" rx="8" fill="#ffffff" stroke="#6a4c9c" stroke-width="1.3"/>
+<rect x="1211" y="182" width="154" height="26" rx="8" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<rect x="1211" y="200" width="154" height="8" rx="0" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<text x="1223" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="11.5" fill="#16191d" font-weight="700" text-anchor="start">Stage 4</text>
+<text x="1353" y="200" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6a4c9c" font-weight="600" text-anchor="end">2 blocks</text>
+<rect x="1223" y="220" width="130" height="16" rx="3" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="1288.0" y="231.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9" fill="#6a4c9c" font-weight="600" text-anchor="middle">W-MSA</text>
+<rect x="1223" y="240" width="130" height="16" rx="3" fill="#ffffff" stroke="#6a4c9c" stroke-width="0.9"/>
+<text x="1288.0" y="251.5" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9" fill="#6a4c9c" font-weight="600" text-anchor="middle">SW-MSA</text>
+<line x1="1223" y1="310" x2="1353" y2="310" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="1223" y="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">tokens</text>
+<text x="1353" y="330" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">7 × 7</text>
+<text x="1223" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">dim</text>
+<text x="1353" y="347" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">768</text>
+<text x="1223" y="364" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">attn</text>
+<text x="1353" y="364" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="600" text-anchor="end">24 heads</text>
+<line x1="706" y1="282" x2="718" y2="282" stroke="#6a4c9c" stroke-width="1.6" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<text x="985.0" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="middle">patch merging halves the token grid and doubles the channel width between stages</text>
+<rect x="1400" y="190" width="240" height="180" rx="10" fill="#ffffff" stroke="#d6dbe0" stroke-width="1"/>
+<text x="1416" y="216" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="700" text-anchor="start" letter-spacing="1.2">HEAD</text>
+<text x="1416" y="242" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">LayerNorm → global average pool</text><text x="1416" y="257" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#16191d" font-weight="600" text-anchor="start">768-d particle embedding</text><text x="1416" y="272" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">Linear 768 → 3   (head re-initialised</text><text x="1416" y="287" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">on warm-start)</text>
+<rect x="1416" y="310" width="208" height="46" rx="6" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<text x="1428" y="329" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6a4c9c" font-weight="600" text-anchor="start">softmax over 3 classes</text>
+<text x="1428" y="346" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="700" text-anchor="start">Dh   ·   FCC   ·   Ih-family</text>
+<line x1="193" y1="280.0" x2="212" y2="280.0" stroke="#6b747d" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<line x1="398" y1="280.0" x2="417" y2="280.0" stroke="#6b747d" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<line x1="573" y1="280.0" x2="592" y2="280.0" stroke="#6b747d" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<line x1="1378" y1="280.0" x2="1397" y2="280.0" stroke="#6b747d" stroke-width="1.8" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="40" y="480" width="520" height="300" rx="12" fill="#ffffff" stroke="#d6dbe0" stroke-width="1"/>
+<text x="60" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#16191d" font-weight="700" text-anchor="start">Inside a Swin block pair</text>
+<text x="60" y="526" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="start">attention runs inside 7 × 7 windows; the window grid shifts by half a</text>
+<text x="60" y="540" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="start">window in the next block, which is what connects them</text>
+<line x1="60" y1="554" x2="540" y2="554" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="60" y="602" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="700" text-anchor="start">block 2k</text>
+<rect x="132" y="586" width="44" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="154.0" y="605" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">LN</text>
+<line x1="178" y1="601" x2="186" y2="601" stroke="#6b747d" stroke-width="1.4" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="188" y="586" width="70" height="30" rx="6" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="1"/>
+<text x="223.0" y="605" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6a4c9c" font-weight="700" text-anchor="middle">W-MSA</text>
+<line x1="260" y1="601" x2="268" y2="601" stroke="#6b747d" stroke-width="1.4" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="270" y="586" width="26" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="283.0" y="605" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">+</text>
+<rect x="308" y="586" width="44" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="330.0" y="605" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">LN</text>
+<line x1="354" y1="601" x2="362" y2="601" stroke="#6b747d" stroke-width="1.4" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="364" y="586" width="62" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="395.0" y="605" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">MLP ×4</text>
+<line x1="428" y1="601" x2="436" y2="601" stroke="#6b747d" stroke-width="1.4" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="438" y="586" width="26" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="451.0" y="605" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">+</text>
+<path d="M132,583 C132,562 276,562 276,583" fill="none" stroke="#6b747d" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="60" y="632" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">windows are disjoint</text>
+<text x="60" y="702" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#16191d" font-weight="700" text-anchor="start">block 2k+1</text>
+<rect x="132" y="686" width="44" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="154.0" y="705" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">LN</text>
+<line x1="178" y1="701" x2="186" y2="701" stroke="#6b747d" stroke-width="1.4" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="188" y="686" width="70" height="30" rx="6" fill="#f1ecf9" stroke="#6a4c9c" stroke-width="1"/>
+<text x="223.0" y="705" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6a4c9c" font-weight="700" text-anchor="middle">SW-MSA</text>
+<line x1="260" y1="701" x2="268" y2="701" stroke="#6b747d" stroke-width="1.4" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="270" y="686" width="26" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="283.0" y="705" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">+</text>
+<rect x="308" y="686" width="44" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="330.0" y="705" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">LN</text>
+<line x1="354" y1="701" x2="362" y2="701" stroke="#6b747d" stroke-width="1.4" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="364" y="686" width="62" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="395.0" y="705" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">MLP ×4</text>
+<line x1="428" y1="701" x2="436" y2="701" stroke="#6b747d" stroke-width="1.4" stroke-linecap="round" marker-end="url(#arrowhead)"/>
+<rect x="438" y="686" width="26" height="30" rx="6" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="451.0" y="705" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="middle">+</text>
+<path d="M132,683 C132,662 276,662 276,683" fill="none" stroke="#6b747d" stroke-width="1.2" stroke-dasharray="4 3"/>
+<text x="60" y="732" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">grid shifted by ⌊7/2⌋ = 3</text>
+<text x="60" y="752" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">Why a windowed transformer here: five-fold twin symmetry is a whole-particle relation,</text>
+<rect x="590" y="480" width="380" height="300" rx="12" fill="#ffffff" stroke="#6a4c9c" stroke-width="1.3"/>
+<text x="610" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#16191d" font-weight="700" text-anchor="start">Why dihedral TTA is principled</text>
+<line x1="610" y1="524" x2="950" y2="524" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="610" y="548" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">The crystallographic phase of a particle is</text><text x="610" y="563" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">invariant under rotation and reflection — a</text><text x="610" y="578" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">decahedron rotated by 90° is still a decahedron.</text><text x="610" y="593" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start"></text><text x="610" y="608" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">So the 8 dihedral views are 8 genuinely</text><text x="610" y="623" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">equivalent observations of the same label.</text><text x="610" y="638" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">Averaging their softmax outputs reduces</text><text x="610" y="653" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">variance without introducing bias.</text>
+<rect x="610" y="680" width="340" height="46" rx="6" fill="#f1ecf9" stroke="none" stroke-width="1"/>
+<text x="624" y="700" font-family="'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace" font-size="11" fill="#6a4c9c" font-weight="600" text-anchor="start">p̄(c | frame)  =  ⅛ Σ  softmax( f( g·x ) )</text>
+<text x="624" y="718" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">g ∈ D₄,  no retraining, 8× inference cost</text>
+<text x="610" y="748" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="15" fill="#6a4c9c" font-weight="700" text-anchor="start">95.88 %  →  96.62 %</text>
+<text x="780" y="748" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="start">(+0.74 pt, measured)</text>
+<rect x="1000" y="480" width="640" height="300" rx="12" fill="#ffffff" stroke="#d6dbe0" stroke-width="1"/>
+<text x="1020" y="508" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#16191d" font-weight="700" text-anchor="start">Temporal post-processing → phase timeline</text>
+<line x1="1020" y1="524" x2="1620" y2="524" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<circle cx="1030" cy="546" r="8.5" fill="#6a4c9c" stroke="none" stroke-width="1"/><text x="1030" y="549.6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#ffffff" font-weight="700" text-anchor="middle">1</text>
+<text x="1048" y="550" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">Stack per-frame posteriors into a T × 3 array</text>
+<circle cx="1030" cy="566" r="8.5" fill="#6a4c9c" stroke="none" stroke-width="1"/><text x="1030" y="569.6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#ffffff" font-weight="700" text-anchor="middle">2</text>
+<text x="1048" y="570" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">Median-filter each class stream over 11 frames — the median kills isolated</text>
+<text x="1048" y="590" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">single-frame flips but preserves a step, which is what a real phase change is</text>
+<circle cx="1030" cy="602" r="8.5" fill="#6a4c9c" stroke="none" stroke-width="1"/><text x="1030" y="605.6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#ffffff" font-weight="700" text-anchor="middle">3</text>
+<text x="1048" y="606" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">argmax → group equal-label runs → absorb runs shorter than 10 frames</text>
+<circle cx="1030" cy="622" r="8.5" fill="#6a4c9c" stroke="none" stroke-width="1"/><text x="1030" y="625.6" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#ffffff" font-weight="700" text-anchor="middle">4</text>
+<text x="1048" y="626" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">Inside each Ih-family segment, query a second model trained without</text>
+<text x="1048" y="646" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#495159" font-weight="400" text-anchor="start">Ih→Dh: p(Ih) &gt; 0.6 ∧ p(Ih) &gt; p(Dh)+0.2 → Ih;  mirror → Dh;  otherwise Ih→Dh</text>
+<text x="1020" y="668" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="700" text-anchor="start" letter-spacing="1">output timeline</text>
+<rect x="1020.0" y="676" width="180.0" height="34" rx="3" fill="#2f6f9f" stroke="none" stroke-width="1" fill-opacity="0.85"/>
+<text x="1110.0" y="698" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle">Ih</text>
+<rect x="1200.0" y="676" width="72.0" height="34" rx="3" fill="#b3402f" stroke="none" stroke-width="1" fill-opacity="0.85"/>
+<text x="1236.0" y="698" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle">Ih→Dh</text>
+<rect x="1272.0" y="676" width="192.0" height="34" rx="3" fill="#1f7a68" stroke="none" stroke-width="1" fill-opacity="0.85"/>
+<text x="1368.0" y="698" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle">Dh</text>
+<rect x="1464.0" y="676" width="59.999999999999986" height="34" rx="3" fill="#a06a14" stroke="none" stroke-width="1" fill-opacity="0.85"/>
+<text x="1494.0" y="698" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle">FCC</text>
+<rect x="1524.0" y="676" width="96.00000000000001" height="34" rx="3" fill="#1f7a68" stroke="none" stroke-width="1" fill-opacity="0.85"/>
+<text x="1572.0" y="698" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#ffffff" font-weight="700" text-anchor="middle">Dh</text>
+<line x1="1020" y1="716" x2="1620" y2="716" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<line x1="1020" y1="716" x2="1020" y2="721" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<line x1="1170.0" y1="716" x2="1170.0" y2="721" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<line x1="1320.0" y1="716" x2="1320.0" y2="721" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<line x1="1470.0" y1="716" x2="1470.0" y2="721" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<line x1="1620.0" y1="716" x2="1620.0" y2="721" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="1020" y="736" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="start">frame 0</text>
+<text x="1620" y="736" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="end">frame T</text>
+<text x="1320.0" y="736" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.5" fill="#6b747d" font-weight="400" text-anchor="middle">time</text>
+<text x="1020" y="764" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#6b747d" font-weight="400" text-anchor="start">written as timeline.png, segments.csv (start / end / duration / label / confidence) and an overlay MP4</text>
+<text x="60" y="768" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10" fill="#495159" font-weight="400" text-anchor="start">while the fringe evidence that separates the phases is local — a shifted-window model has both.</text>
+<rect x="40" y="810" width="1600" height="150" rx="12" fill="#f5f7f9" stroke="#d6dbe0" stroke-width="1"/>
+<text x="64" y="840" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13" fill="#16191d" font-weight="700" text-anchor="start">Training configuration</text>
+<line x1="64" y1="852" x2="1616" y2="852" stroke="#d6dbe0" stroke-width="1" stroke-linecap="round"/>
+<text x="64.0" y="880" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#6a4c9c" font-weight="700" text-anchor="start">Objective</text>
+<text x="64.0" y="896" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">cross-entropy, label smoothing 0.05</text><text x="64.0" y="909" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">inverse-frequency class weights</text>
+<text x="581.3333333333334" y="880" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#6a4c9c" font-weight="700" text-anchor="start">Sampler</text>
+<text x="581.3333333333334" y="896" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">WeightedRandomSampler, power 1.0</text><text x="581.3333333333334" y="909" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">(classes fully equalised per epoch)</text>
+<text x="1098.6666666666667" y="880" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#6a4c9c" font-weight="700" text-anchor="start">Optimiser</text>
+<text x="1098.6666666666667" y="896" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">AdamW, lr 1e-4 (warm-start) / 3e-4</text><text x="1098.6666666666667" y="909" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">weight decay 1e-4, cosine annealing</text>
+<text x="64.0" y="926" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#6a4c9c" font-weight="700" text-anchor="start">Schedule</text>
+<text x="64.0" y="942" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">batch 32, 20–25 epochs, seed 44</text><text x="64.0" y="955" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">best-val checkpoint kept</text>
+<text x="581.3333333333334" y="926" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#6a4c9c" font-weight="700" text-anchor="start">Augmentation</text>
+<text x="581.3333333333334" y="942" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">RandomResizedCrop(224, 0.6–1.0), H/V flip</text><text x="581.3333333333334" y="955" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">exact 0/90/180/270° rotation, jitter 0.2</text>
+<text x="1098.6666666666667" y="926" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="10.5" fill="#6a4c9c" font-weight="700" text-anchor="start">Warm start</text>
+<text x="1098.6666666666667" y="942" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">backbone loaded from a prior 3-class ckpt;</text><text x="1098.6666666666667" y="955" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="9.8" fill="#495159" font-weight="400" text-anchor="start">needed to escape the imbalance minimum</text>
+</svg>

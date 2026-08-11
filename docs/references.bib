@@ -1,0 +1,276 @@
+% ============================================================================
+% References for the LC-TEM nanoparticle pipeline
+% See docs/PIPELINE_METHODS.md section 8 for which entry belongs to which stage.
+% ============================================================================
+
+% ---------------------------------------------------------------------------
+% DENOISING STAGE
+% ---------------------------------------------------------------------------
+
+% The denoiser actually used in production (UMVD, blind-frame temporal masking).
+@inproceedings{aiyetigbo2024umvd,
+  title     = {Unsupervised Microscopy Video Denoising},
+  author    = {Aiyetigbo, Mary and Korte, Alexander and Anderson, Ethan and
+               Chalhoub, Reda and Kalivas, Peter and Luo, Feng and Li, Nianyi},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
+               Pattern Recognition (CVPR) Workshops},
+  year      = {2024},
+  note      = {arXiv:2404.12163},
+  url       = {https://arxiv.org/abs/2404.12163}
+}
+
+% UDVD -- the baseline denoiser and the upstream code base of this repository.
+@inproceedings{sheth2021udvd,
+  title     = {Unsupervised Deep Video Denoising},
+  author    = {Sheth, Dev Yashpal and Mohan, Sreyas and Vincent, Joshua L. and
+               Manzorro, Ramon and Crozier, Peter A. and Khapra, Mitesh M. and
+               Simoncelli, Eero P. and Fernandez-Granda, Carlos},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on
+               Computer Vision (ICCV)},
+  pages     = {1759--1768},
+  year      = {2021},
+  note      = {arXiv:2011.15045},
+  url       = {https://arxiv.org/abs/2011.15045}
+}
+
+% Application precedent: unsupervised denoising of low-dose TEM movies of
+% fluxional nanoparticle surfaces (the UDVD-MF "Science" paper).
+@article{crozier2025denoising,
+  title   = {Visualizing nanoparticle surface dynamics and instabilities
+             enabled by deep denoising},
+  author  = {Crozier, Peter A. and Leibovich, Matan and Haluai, Piyush and
+             Tan, Mai and Thomas, Andrew M. and Vincent, Joshua and
+             Mohan, Sreyas and Marcos Morales, Adria and Kulkarni, Shreyas A. and
+             Matteson, David S. and Wang, Yifan and Fernandez-Granda, Carlos},
+  journal = {Science},
+  volume  = {387},
+  number  = {6737},
+  pages   = {949--954},
+  year    = {2025},
+  doi     = {10.1126/science.ads2688}
+}
+
+% How to evaluate an unsupervised denoiser with no ground truth.
+@inproceedings{marcosmorales2023unsupervisedmetrics,
+  title     = {Evaluating Unsupervised Denoising Requires Unsupervised Metrics},
+  author    = {Marcos Morales, Adria and Leibovich, Matan and Mohan, Sreyas and
+               Vincent, Joshua L. and Haluai, Piyush and Tan, Mai and
+               Crozier, Peter A. and Fernandez-Granda, Carlos},
+  booktitle = {Proceedings of the 40th International Conference on Machine
+               Learning (ICML)},
+  series    = {PMLR},
+  volume    = {202},
+  pages     = {23937--23957},
+  year      = {2023},
+  url       = {https://arxiv.org/abs/2210.05553}
+}
+
+% The statistical foundation of training against a noisy target.
+@inproceedings{lehtinen2018noise2noise,
+  title     = {{Noise2Noise}: Learning Image Restoration without Clean Data},
+  author    = {Lehtinen, Jaakko and Munkberg, Jacob and Hasselgren, Jon and
+               Laine, Samuli and Karras, Tero and Aittala, Miika and Aila, Timo},
+  booktitle = {Proceedings of the 35th International Conference on Machine
+               Learning (ICML)},
+  year      = {2018}
+}
+
+@inproceedings{krull2019noise2void,
+  title     = {{Noise2Void} -- Learning Denoising from Single Noisy Images},
+  author    = {Krull, Alexander and Buchholz, Tim-Oliver and Jug, Florian},
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
+               Pattern Recognition (CVPR)},
+  year      = {2019}
+}
+
+% Source of the four-rotation half-plane receptive field used in UDVD's BlindSpotNet.
+@inproceedings{laine2019highquality,
+  title     = {High-Quality Self-Supervised Deep Image Denoising},
+  author    = {Laine, Samuli and Karras, Tero and Lehtinen, Jaakko and Aila, Timo},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2019}
+}
+
+% ---------------------------------------------------------------------------
+% DRIFT CORRECTION STAGE
+% ---------------------------------------------------------------------------
+
+% TurboReg -- the algorithm behind pystackreg.
+@article{thevenaz1998turboreg,
+  title   = {A Pyramid Approach to Subpixel Registration Based on Intensity},
+  author  = {Th{\'e}venaz, Philippe and Ruttimann, Urs E. and Unser, Michael},
+  journal = {IEEE Transactions on Image Processing},
+  volume  = {7},
+  number  = {1},
+  pages   = {27--41},
+  year    = {1998},
+  doi     = {10.1109/83.650848}
+}
+
+@article{savitzky1964smoothing,
+  title   = {Smoothing and Differentiation of Data by Simplified Least Squares
+             Procedures},
+  author  = {Savitzky, Abraham and Golay, Marcel J. E.},
+  journal = {Analytical Chemistry},
+  volume  = {36},
+  number  = {8},
+  pages   = {1627--1639},
+  year    = {1964},
+  doi     = {10.1021/ac60214a047}
+}
+
+% ---------------------------------------------------------------------------
+% SEGMENTATION STAGE
+% ---------------------------------------------------------------------------
+
+@article{carion2025sam3,
+  title   = {{SAM 3}: Segment Anything with Concepts},
+  author  = {Carion, Nicolas and Gustafson, Laura and Hu, Yuan-Ting and
+             Debnath, Shoubhik and Hu, Ronghang and Suris, Didac and
+             Ryali, Chaitanya and Alwala, Kalyan Vasudev and Khedr, Haitham and
+             Huang, Andrew and others},
+  journal = {arXiv preprint arXiv:2511.16719},
+  year    = {2025},
+  url     = {https://arxiv.org/abs/2511.16719}
+}
+
+@inproceedings{kirillov2023sam,
+  title     = {Segment Anything},
+  author    = {Kirillov, Alexander and Mintun, Eric and Ravi, Nikhila and
+               Mao, Hanzi and Rolland, Chloe and Gustafson, Laura and Xiao, Tete and
+               Whitehead, Spencer and Berg, Alexander C. and Lo, Wan-Yen and
+               Doll{\'a}r, Piotr and Girshick, Ross},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on
+               Computer Vision (ICCV)},
+  year      = {2023}
+}
+
+% ---------------------------------------------------------------------------
+% CLASSIFICATION STAGE
+% ---------------------------------------------------------------------------
+
+@inproceedings{liu2021swin,
+  title     = {Swin Transformer: Hierarchical Vision Transformer using
+               Shifted Windows},
+  author    = {Liu, Ze and Lin, Yutong and Cao, Yue and Hu, Han and Wei, Yixuan and
+               Zhang, Zheng and Lin, Stephen and Guo, Baining},
+  booktitle = {Proceedings of the IEEE/CVF International Conference on
+               Computer Vision (ICCV)},
+  pages     = {10012--10022},
+  year      = {2021}
+}
+
+@misc{wightman2019timm,
+  title        = {{PyTorch} Image Models},
+  author       = {Wightman, Ross},
+  year         = {2019},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/huggingface/pytorch-image-models}},
+  doi          = {10.5281/zenodo.4414861}
+}
+
+@inproceedings{deng2009imagenet,
+  title     = {{ImageNet}: A Large-Scale Hierarchical Image Database},
+  author    = {Deng, Jia and Dong, Wei and Socher, Richard and Li, Li-Jia and
+               Li, Kai and Fei-Fei, Li},
+  booktitle = {IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2009}
+}
+
+@inproceedings{loshchilov2019adamw,
+  title     = {Decoupled Weight Decay Regularization},
+  author    = {Loshchilov, Ilya and Hutter, Frank},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2019}
+}
+
+@inproceedings{loshchilov2017sgdr,
+  title     = {{SGDR}: Stochastic Gradient Descent with Warm Restarts},
+  author    = {Loshchilov, Ilya and Hutter, Frank},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2017}
+}
+
+@inproceedings{szegedy2016labelsmoothing,
+  title     = {Rethinking the Inception Architecture for Computer Vision},
+  author    = {Szegedy, Christian and Vanhoucke, Vincent and Ioffe, Sergey and
+               Shlens, Jon and Wojna, Zbigniew},
+  booktitle = {IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2016}
+}
+
+@inproceedings{cubuk2020randaugment,
+  title     = {{RandAugment}: Practical Automated Data Augmentation with a
+               Reduced Search Space},
+  author    = {Cubuk, Ekin D. and Zoph, Barret and Shlens, Jonathon and Le, Quoc V.},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition
+               Workshops (CVPRW)},
+  year      = {2020}
+}
+
+% ---------------------------------------------------------------------------
+% SYNTHETIC TRAINING DATA
+% ---------------------------------------------------------------------------
+
+@article{madsen2021abtem,
+  title   = {The {abTEM} code: transmission electron microscopy from first
+             principles},
+  author  = {Madsen, Jacob and Susi, Toma},
+  journal = {Open Research Europe},
+  volume  = {1},
+  pages   = {24},
+  year    = {2021},
+  doi     = {10.12688/openreseurope.13015.1}
+}
+
+@book{kirkland2010advanced,
+  title     = {Advanced Computing in Electron Microscopy},
+  author    = {Kirkland, Earl J.},
+  edition   = {2nd},
+  publisher = {Springer},
+  year      = {2010},
+  doi       = {10.1007/978-1-4419-6533-2}
+}
+
+@article{larsen2017ase,
+  title   = {The atomic simulation environment---a {Python} library for working
+             with atoms},
+  author  = {Larsen, Ask Hjorth and Mortensen, Jens J{\o}rgen and Blomqvist, Jakob
+             and others},
+  journal = {Journal of Physics: Condensed Matter},
+  volume  = {29},
+  number  = {27},
+  pages   = {273002},
+  year    = {2017},
+  doi     = {10.1088/1361-648X/aa680e}
+}
+
+% ---------------------------------------------------------------------------
+% SOFTWARE / FRAMEWORK
+% ---------------------------------------------------------------------------
+
+@inproceedings{paszke2019pytorch,
+  title     = {{PyTorch}: An Imperative Style, High-Performance Deep Learning
+               Library},
+  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and others},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2019}
+}
+
+@article{virtanen2020scipy,
+  title   = {{SciPy} 1.0: fundamental algorithms for scientific computing in
+             {Python}},
+  author  = {Virtanen, Pauli and Gommers, Ralf and Oliphant, Travis E. and others},
+  journal = {Nature Methods},
+  volume  = {17},
+  pages   = {261--272},
+  year    = {2020},
+  doi     = {10.1038/s41592-019-0686-2}
+}
+
+@article{bradski2000opencv,
+  title   = {The {OpenCV} Library},
+  author  = {Bradski, Gary},
+  journal = {Dr. Dobb's Journal of Software Tools},
+  year    = {2000}
+}
