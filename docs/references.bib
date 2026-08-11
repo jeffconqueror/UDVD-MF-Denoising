@@ -1,5 +1,11 @@
 % ============================================================================
 % References for the LC-TEM nanoparticle pipeline
+%
+% Every entry below was verified against a primary source (publisher page, CVF
+% Open Access, PMLR, PubMed, arXiv or the project's own repository) on
+% 2026-08-11. Each carries a DOI or URL so it can be located directly; all are
+% findable on Google Scholar by title.
+%
 % See docs/PIPELINE_METHODS.md section 8 for which entry belongs to which stage.
 % ============================================================================
 
@@ -8,6 +14,7 @@
 % ---------------------------------------------------------------------------
 
 % The denoiser actually used in production (UMVD, blind-frame temporal masking).
+% Verified: CVF Open Access, CVPR 2024 CVMI workshop.
 @inproceedings{aiyetigbo2024umvd,
   title     = {Unsupervised Microscopy Video Denoising},
   author    = {Aiyetigbo, Mary and Korte, Alexander and Anderson, Ethan and
@@ -15,11 +22,12 @@
   booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
                Pattern Recognition (CVPR) Workshops},
   year      = {2024},
-  note      = {arXiv:2404.12163},
+  note      = {CVMI workshop; arXiv:2404.12163},
   url       = {https://arxiv.org/abs/2404.12163}
 }
 
 % UDVD -- the baseline denoiser and the upstream code base of this repository.
+% Verified: CVF Open Access, ICCV 2021, pp. 1759-1768.
 @inproceedings{sheth2021udvd,
   title     = {Unsupervised Deep Video Denoising},
   author    = {Sheth, Dev Yashpal and Mohan, Sreyas and Vincent, Joshua L. and
@@ -30,11 +38,11 @@
   pages     = {1759--1768},
   year      = {2021},
   note      = {arXiv:2011.15045},
-  url       = {https://arxiv.org/abs/2011.15045}
+  url       = {https://openaccess.thecvf.com/content/ICCV2021/html/Sheth_Unsupervised_Deep_Video_Denoising_ICCV_2021_paper.html}
 }
 
 % Application precedent: unsupervised denoising of low-dose TEM movies of
-% fluxional nanoparticle surfaces (the UDVD-MF "Science" paper).
+% fluxional nanoparticle surfaces. Verified: PubMed 40014729.
 @article{crozier2025denoising,
   title   = {Visualizing nanoparticle surface dynamics and instabilities
              enabled by deep denoising},
@@ -51,44 +59,58 @@
 }
 
 % How to evaluate an unsupervised denoiser with no ground truth.
+% Verified: PMLR v202, pp. 23937-23957.
 @inproceedings{marcosmorales2023unsupervisedmetrics,
   title     = {Evaluating Unsupervised Denoising Requires Unsupervised Metrics},
   author    = {Marcos Morales, Adria and Leibovich, Matan and Mohan, Sreyas and
-               Vincent, Joshua L. and Haluai, Piyush and Tan, Mai and
+               Vincent, Joshua Lawrence and Haluai, Piyush and Tan, Mai and
                Crozier, Peter A. and Fernandez-Granda, Carlos},
   booktitle = {Proceedings of the 40th International Conference on Machine
                Learning (ICML)},
-  series    = {PMLR},
+  series    = {Proceedings of Machine Learning Research},
   volume    = {202},
   pages     = {23937--23957},
   year      = {2023},
-  url       = {https://arxiv.org/abs/2210.05553}
+  note      = {arXiv:2210.05553},
+  url       = {https://proceedings.mlr.press/v202/marcos-morales23a.html}
 }
 
 % The statistical foundation of training against a noisy target.
+% Verified: PMLR v80, pp. 2965-2974.
 @inproceedings{lehtinen2018noise2noise,
   title     = {{Noise2Noise}: Learning Image Restoration without Clean Data},
   author    = {Lehtinen, Jaakko and Munkberg, Jacob and Hasselgren, Jon and
                Laine, Samuli and Karras, Tero and Aittala, Miika and Aila, Timo},
   booktitle = {Proceedings of the 35th International Conference on Machine
                Learning (ICML)},
-  year      = {2018}
+  series    = {Proceedings of Machine Learning Research},
+  volume    = {80},
+  pages     = {2965--2974},
+  year      = {2018},
+  url       = {https://proceedings.mlr.press/v80/lehtinen18a.html}
 }
 
+% Verified: CVPR 2019, pp. 2129-2137.
 @inproceedings{krull2019noise2void,
   title     = {{Noise2Void} -- Learning Denoising from Single Noisy Images},
   author    = {Krull, Alexander and Buchholz, Tim-Oliver and Jug, Florian},
   booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
                Pattern Recognition (CVPR)},
-  year      = {2019}
+  pages     = {2129--2137},
+  year      = {2019},
+  url       = {https://dblp.org/rec/conf/cvpr/KrullBJ19.html}
 }
 
-% Source of the four-rotation half-plane receptive field used in UDVD's BlindSpotNet.
+% Source of the four-rotation half-plane receptive field used in UDVD's
+% BlindSpotNet. Verified: NeurIPS 2019 proceedings.
 @inproceedings{laine2019highquality,
   title     = {High-Quality Self-Supervised Deep Image Denoising},
   author    = {Laine, Samuli and Karras, Tero and Lehtinen, Jaakko and Aila, Timo},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2019}
+  volume    = {32},
+  year      = {2019},
+  note      = {arXiv:1901.10277},
+  url       = {https://proceedings.neurips.cc/paper/2019/hash/2119b8d43eafcf353e07d7cb5554170b-Abstract.html}
 }
 
 % ---------------------------------------------------------------------------
@@ -96,6 +118,7 @@
 % ---------------------------------------------------------------------------
 
 % TurboReg -- the algorithm behind pystackreg.
+% Verified: IEEE TIP 7(1), 27-41, doi 10.1109/83.650848.
 @article{thevenaz1998turboreg,
   title   = {A Pyramid Approach to Subpixel Registration Based on Intensity},
   author  = {Th{\'e}venaz, Philippe and Ruttimann, Urs E. and Unser, Michael},
@@ -123,6 +146,7 @@
 % SEGMENTATION STAGE
 % ---------------------------------------------------------------------------
 
+% Verified: arXiv 2511.16719 (v1 Nov 2025).
 @article{carion2025sam3,
   title   = {{SAM 3}: Segment Anything with Concepts},
   author  = {Carion, Nicolas and Gustafson, Laura and Hu, Yuan-Ting and
@@ -134,6 +158,8 @@
   url     = {https://arxiv.org/abs/2511.16719}
 }
 
+% Lineage only -- cite if you want the SAM family history.
+% Verified: ICCV 2023, pp. 4015-4026, arXiv 2304.02643.
 @inproceedings{kirillov2023sam,
   title     = {Segment Anything},
   author    = {Kirillov, Alexander and Mintun, Eric and Ravi, Nikhila and
@@ -142,13 +168,19 @@
                Doll{\'a}r, Piotr and Girshick, Ross},
   booktitle = {Proceedings of the IEEE/CVF International Conference on
                Computer Vision (ICCV)},
-  year      = {2023}
+  pages     = {4015--4026},
+  year      = {2023},
+  note      = {arXiv:2304.02643},
+  url       = {https://openaccess.thecvf.com/content/ICCV2023/html/Kirillov_Segment_Anything_ICCV_2023_paper.html}
 }
 
 % ---------------------------------------------------------------------------
 % CLASSIFICATION STAGE
 % ---------------------------------------------------------------------------
 
+% NOTE: the page range differs between editions of the proceedings --
+% CVF Open Access gives 10012-10022, IEEE Xplore gives 9992-10002. The CVF
+% numbering is used here; the URL disambiguates.
 @inproceedings{liu2021swin,
   title     = {Swin Transformer: Hierarchical Vision Transformer using
                Shifted Windows},
@@ -157,9 +189,12 @@
   booktitle = {Proceedings of the IEEE/CVF International Conference on
                Computer Vision (ICCV)},
   pages     = {10012--10022},
-  year      = {2021}
+  year      = {2021},
+  url       = {https://openaccess.thecvf.com/content/ICCV2021/html/Liu_Swin_Transformer_Hierarchical_Vision_Transformer_Using_Shifted_Windows_ICCV_2021_paper.html}
 }
 
+% Software citation (the upstream repo's own recommended key is rw2019timm).
+% Verified: Zenodo DOI 10.5281/zenodo.4414861.
 @misc{wightman2019timm,
   title        = {{PyTorch} Image Models},
   author       = {Wightman, Ross},
@@ -174,44 +209,64 @@
   author    = {Deng, Jia and Dong, Wei and Socher, Richard and Li, Li-Jia and
                Li, Kai and Fei-Fei, Li},
   booktitle = {IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year      = {2009}
+  year      = {2009},
+  doi       = {10.1109/CVPR.2009.5206848}
 }
 
+% Verified: ICLR 2019 (7th ICLR, New Orleans). Formerly "Fixing Weight Decay
+% Regularization in Adam".
 @inproceedings{loshchilov2019adamw,
   title     = {Decoupled Weight Decay Regularization},
   author    = {Loshchilov, Ilya and Hutter, Frank},
   booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2019}
+  year      = {2019},
+  url       = {https://dblp.org/rec/conf/iclr/LoshchilovH19.html}
 }
 
+% Verified: ICLR 2017 poster; arXiv 1608.03983.
 @inproceedings{loshchilov2017sgdr,
   title     = {{SGDR}: Stochastic Gradient Descent with Warm Restarts},
   author    = {Loshchilov, Ilya and Hutter, Frank},
   booktitle = {International Conference on Learning Representations (ICLR)},
-  year      = {2017}
+  year      = {2017},
+  note      = {arXiv:1608.03983},
+  url       = {https://openreview.net/forum?id=Skq89Scxx}
 }
 
+% Label smoothing is introduced in section 7 of this paper.
+% Verified: CVPR 2016, pp. 2818-2826.
 @inproceedings{szegedy2016labelsmoothing,
   title     = {Rethinking the Inception Architecture for Computer Vision},
   author    = {Szegedy, Christian and Vanhoucke, Vincent and Ioffe, Sergey and
                Shlens, Jon and Wojna, Zbigniew},
-  booktitle = {IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year      = {2016}
+  booktitle = {Proceedings of the IEEE Conference on Computer Vision and
+               Pattern Recognition (CVPR)},
+  pages     = {2818--2826},
+  year      = {2016},
+  url       = {https://openaccess.thecvf.com/content_cvpr_2016/html/Szegedy_Rethinking_the_Inception_CVPR_2016_paper.html}
 }
 
+% NOTE: this paper appeared at BOTH CVPR Workshops 2020 (pp. 3008-3017) and
+% NeurIPS 2020 (Advances in NeurIPS 33). The CVPRW version is cited here;
+% switch to the NeurIPS one if your venue prefers it.
 @inproceedings{cubuk2020randaugment,
   title     = {{RandAugment}: Practical Automated Data Augmentation with a
                Reduced Search Space},
   author    = {Cubuk, Ekin D. and Zoph, Barret and Shlens, Jonathon and Le, Quoc V.},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition
-               Workshops (CVPRW)},
-  year      = {2020}
+  booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
+               Pattern Recognition (CVPR) Workshops},
+  pages     = {3008--3017},
+  year      = {2020},
+  note      = {also in Advances in NeurIPS 33 (2020); arXiv:1909.13719},
+  url       = {https://arxiv.org/abs/1909.13719}
 }
 
 % ---------------------------------------------------------------------------
 % SYNTHETIC TRAINING DATA
 % ---------------------------------------------------------------------------
 
+% Verified: Open Research Europe 1:24 (2021). The DOI below is version 2, the
+% current indexed version; version 1 is ...13015.1.
 @article{madsen2021abtem,
   title   = {The {abTEM} code: transmission electron microscopy from first
              principles},
@@ -220,9 +275,12 @@
   volume  = {1},
   pages   = {24},
   year    = {2021},
-  doi     = {10.12688/openreseurope.13015.1}
+  doi     = {10.12688/openreseurope.13015.2},
+  url     = {https://open-research-europe.ec.europa.eu/articles/1-24}
 }
 
+% The scattering-factor parametrization used by abTEM's Potential.
+% Verified: Springer, 2nd edition, 2010.
 @book{kirkland2010advanced,
   title     = {Advanced Computing in Electron Microscopy},
   author    = {Kirkland, Earl J.},
@@ -232,6 +290,8 @@
   doi       = {10.1007/978-1-4419-6533-2}
 }
 
+% The cluster builders (Icosahedron / Decahedron / Octahedron).
+% Verified: J. Phys. Condens. Matter 29, 273002 (2017).
 @article{larsen2017ase,
   title   = {The atomic simulation environment---a {Python} library for working
              with atoms},
@@ -249,12 +309,19 @@
 % SOFTWARE / FRAMEWORK
 % ---------------------------------------------------------------------------
 
+% Verified: NeurIPS 2019 (Advances in NeurIPS 32), pp. 8024-8035.
 @inproceedings{paszke2019pytorch,
   title     = {{PyTorch}: An Imperative Style, High-Performance Deep Learning
                Library},
-  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and others},
+  author    = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam
+               and Bradbury, James and Chanan, Gregory and Killeen, Trevor and
+               Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and others},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year      = {2019}
+  volume    = {32},
+  pages     = {8024--8035},
+  year      = {2019},
+  note      = {arXiv:1912.01703},
+  url       = {https://papers.nips.cc/paper/9015-pytorch-an-imperative-style-high-performance-deep-learning-library}
 }
 
 @article{virtanen2020scipy,
@@ -268,9 +335,12 @@
   doi     = {10.1038/s41592-019-0686-2}
 }
 
+% The canonical OpenCV citation. It is a magazine article, not a peer-reviewed
+% paper -- some venues prefer citing the library URL instead.
 @article{bradski2000opencv,
   title   = {The {OpenCV} Library},
   author  = {Bradski, Gary},
   journal = {Dr. Dobb's Journal of Software Tools},
-  year    = {2000}
+  year    = {2000},
+  url     = {https://opencv.org}
 }
