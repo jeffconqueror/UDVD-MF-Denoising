@@ -22,6 +22,7 @@ datasets, the results tables, and a stage-by-stage citation guide:
 | **[Figure 1](docs/figures/fig1_pipeline.png)** ([SVG](docs/figures/fig1_pipeline.svg)) | Pipeline as a network graph — real data tensors at every stage, the UMVD denoiser expanded inline (blind-frame mask, U-Net, self-supervised loss), and the four sub-networks expanded below |
 | **[Figure 2](docs/figures/fig2_classifier.png)** ([SVG](docs/figures/fig2_classifier.svg)) | Classifier as a network graph — Swin-Tiny drawn as feature volumes, dihedral TTA, Swin block internals, W-MSA vs SW-MSA, and the three classes |
 | `docs/figures/make_figures.py` | Regenerates both figures (no dependencies; SVG is editable in Inkscape/Illustrator) |
+| **[Figure 3](docs/figures/fig3_classifier_arch.png)** ([SVG](docs/figures/fig3_classifier_arch.svg)) | Compact alternative to Figure 2 — the classifier architecture alone, in the standard layer-slab style, for when Figure 2 is too broad for the page |
 | `docs/figures/make_thumbnails.py` | Re-extracts the real frame thumbnails from `/shared` into `docs/figures/assets/` |
 
 ![Pipeline](docs/figures/fig1_pipeline.png)
@@ -240,7 +241,9 @@ Ensembling multiple classifier models was tested and **rejected** (weaker models
 | `figures/make_thumbnails.py` | extracts the real frame thumbnails the figures embed |
 | `figures/assets/` | those thumbnails (real frames, one per pipeline stage) |
 | `figures/fig1_pipeline.svg/.png` | Figure 1 — pipeline network graph |
-| `figures/fig2_classifier.svg/.png` | Figure 2 — classifier network graph |
+| `figures/fig2_classifier.svg/.png` | Figure 2 — classifier network graph (wide) |
+| `figures/make_fig3.py` | builds Figure 3 (reuses the primitives in `make_figures.py`) |
+| `figures/fig3_classifier_arch.svg/.png` | Figure 3 — compact classifier architecture panel |
 
 ---
 
